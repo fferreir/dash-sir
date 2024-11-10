@@ -1,2 +1,2 @@
 # dash-sir
-Dash app for simulating SIR models
+Dash app para simulação de modelos SIRS.
