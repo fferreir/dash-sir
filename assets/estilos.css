@@ -1,0 +1,57 @@
+div.container {
+        height: 100%;
+        width: 100%;
+    }
+
+    div.introducao {
+        width: 50%;
+        display: inline-block;
+        font-size: 1vw;
+        text-align: left;
+        padding: 0vw 0vw 5vw 0vw;
+        min-width:47vw;
+    }
+
+    div.grafico {
+        width: 50%;
+        display: inline-block;
+        font-size: 1vw;
+        text-align: center;
+        padding: 0vw 0vw 5vw 0vw;
+        min-width:47vw;
+        float:right;
+    }
+
+    div.parametros {
+        width: 50%;
+        margin-right: 0vw;
+        font-size: 1vw;
+        text-align: left;
+    }
+
+    div.perguntas {
+        width: 50%;
+        margin-right: 0vw;
+        font-size: 1vw;
+        text-align: left;
+    }
+
+
+img[alt="Modelo SIR"] { width: 800px; text-align: center;}
+.app-header {
+    height: 60px;
+    line-height: 60px;
+    border-bottom: thin lightgrey solid;
+}
+
+.app-header .app-header--title {
+    font-size: 22px;
+    padding-left: 5px;
+}
+body {
+    font-family: sans-serif;
+}
+h1, h2, h3, h4, h5, h6 {
+    color: #ffffff;
+    background-color:#729fcf;
+}

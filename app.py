@@ -15,8 +15,8 @@ cabecalho = html.H1("Modelo SIRS com vacinação",className="bg-primary text-whi
 
 descricao = dcc.Markdown(
     '''
-    É apresentado um modelo determinístico do tipo *SIRS* com vacinação. Neste modelo a população é dividida em três 
-    compartimentos: suscetíveis ($$S$$), infectados($$I$$) e recuperados ($$R$$). A população é considerada fechada, 
+    É apresentado um modelo determinístico do tipo *SIRS* com vacinação. Neste modelo a população é dividida em três
+    compartimentos: suscetíveis ($$S$$), infectados($$I$$) e recuperados ($$R$$). A população é considerada fechada,
     ou seja, a taxa de mortalidade é igual a de natalidade e a doença não causa mortalidade significativa. A imunidade
     conferida pela infecção e/ou vacinação não é permanente.
     ''', mathjax=True
@@ -37,11 +37,11 @@ parametros = dcc.Markdown(
 )
 cond_inicial = dcc.Markdown(
     '''
-    * coeficiente de transmissão: $$\\beta=0.5 \space ano^{-1}$$
-    * taxa de recuperação: $$\\gamma=0.01 \space ano^{-1}$$
-    * taxa de vacinação: $$\\nu_0=0.0 \space ano^{-1}$$, $$t_1=20$$ e $$t_2=50$$
-    * texa de perda de imunidade: $$\delta=1 \space ano^{-1}$$
-    * taxa de natalidade (= taxa de mortalidade): $$\\alpha=\\mu=0.15 \space ano^{-1}$$
+    * coeficiente de transmissão: $$\\beta=0.5 \\space ano^{-1}$$
+    * taxa de recuperação: $$\\gamma=0.01 \\space ano^{-1}$$
+    * taxa de vacinação: $$\\nu_0=0.0 \\space ano^{-1}$$, $$t_1=20$$ e $$t_2=50$$
+    * texa de perda de imunidade: $$\\delta=1 \\space ano^{-1}$$
+    * taxa de natalidade (= taxa de mortalidade): $$\\alpha=\\mu=0.15 \\space ano^{-1}$$
     * condições iniciais: $$S(0)=100$$, $$I(0)=1$$, $$R(0)=0$$
     ''', mathjax=True
 )
@@ -50,13 +50,13 @@ perguntas = dcc.Markdown(
     '''
     1. Para a configuração inicial dos parâmetros, em quanto tempo
     se atinge o estado de equilíbrio? Estime a proporção de animais positivos e o número de animais infectados.
-    2. Responda às mesmas questões do item 1, considerando uma taxa de recuperação de $$\\gamma=1 \space ano^{-1}$$
-    e $$\\beta=0.05 \space ano^{-1}$$.
-    3. Retornando à configuração inicial de parâmetros, adote $$\\nu_0=1.0 \space ano^{-1}$$ e
-    $$\gamma=0.01 \space ano^{-1}$$. Qual o efeito sobre o número de suscetíveis de se abandonar o programa de vacinação?
+    2. Responda às mesmas questões do item 1, considerando uma taxa de recuperação de $$\\gamma=1 \\space ano^{-1}$$
+    e $$\\beta=0.05 \\space ano^{-1}$$.
+    3. Retornando à configuração inicial de parâmetros, adote $$\\nu_0=1.0 \\space ano^{-1}$$ e
+    $$\\gamma=0.01 \\space ano^{-1}$$. Qual o efeito sobre o número de suscetíveis de se abandonar o programa de vacinação?
     Como fica o número de animais infectados?
-    4. Reduzindo o período infeccioso, por meio do aumento da taxa de recuperação para $$\\gamma=0.1 \space ano^{-1}$$ e
-    diminuindo a taxa de vacinação para $$\\nu_0=0.2 \space ano^{-1}$$, observe o que ocorre com o número de suscetíveis
+    4. Reduzindo o período infeccioso, por meio do aumento da taxa de recuperação para $$\\gamma=0.1 \\space ano^{-1}$$ e
+    diminuindo a taxa de vacinação para $$\\nu_0=0.2 \\space ano^{-1}$$, observe o que ocorre com o número de suscetíveis
     e infectados.
     ''', mathjax=True
 )
@@ -180,17 +180,22 @@ def ode_sys(t, state, alpha, beta, gamma, delta, mu, nu, t_begv, t_endv):
 def gera_grafico(s_init, i_init, r_init, alpha, beta, gamma, delta, nu, vacinacao):
     t_begin = 0.
     t_end = 10.
-    t_nsamples = 1000
-    t_space = np.linspace(t_begin, t_end, t_nsamples)
+    t_span = (t_begin, t_end)
+    t_nsamples = 10000
+    t_eval = np.linspace(t_begin, t_end, t_nsamples)
     mu = alpha
-    sol = odeint(ode_sys, [s_init, i_init, r_init], t_space, (alpha, beta, gamma, delta, mu, nu, vacinacao[0], vacinacao[1]),
-                 tfirst=True)
+    sol = solve_ivp(fun=ode_sys, 
+                    t_span=t_span, 
+                    y0=[s_init, i_init, r_init], 
+                    args=(alpha, beta, gamma, delta, mu, nu, vacinacao[0], vacinacao[1]),
+                    t_eval=t_eval,
+                    method='Radau')
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=t_space, y=sol[:,0]/(sol[:,0]+sol[:,1]+sol[:,2])*100, name='Suscetível',
+    fig.add_trace(go.Scatter(x=sol.t, y=sol.y[0]/(sol.y[0]+sol.y[1]+sol.y[2])*100, name='Suscetível',
                              line=dict(color='#00b400', width=4)))
-    fig.add_trace(go.Scatter(x=t_space, y=sol[:,1]/(sol[:,0]+sol[:,1]+sol[:,2])*100, name ='Infectado',
+    fig.add_trace(go.Scatter(x=sol.t, y=sol.y[1]/(sol.y[0]+sol.y[1]+sol.y[2])*100, name ='Infectado',
                              line=dict(color='#ff0000', width=4)))
-    fig.add_trace(go.Scatter(x=t_space, y=sol[:,2]/(sol[:,0]+sol[:,1]+sol[:,2])*100, name='Recuperado',
+    fig.add_trace(go.Scatter(x=sol.t, y=sol.y[2]/(sol.y[0]+sol.y[1]+sol.y[2])*100, name='Recuperado',
                              line=dict(color='#0000ff', width=4)))
     fig.update_layout(title='Dinâmica Modelo SIRS com vacinação',
                        xaxis_title='Tempo',
@@ -202,8 +207,10 @@ app.layout = dbc.Container([
                 dbc.Row([
                         dbc.Col(html.Div(ajuste_parametros), width=3),
                         dbc.Col(html.Div([ajuste_condicoes_iniciais,html.Div(textos_descricao)]), width=3),
-                        dbc.Col(dcc.Graph(id='population_chart'), width=6),
-                        ]),
+                        dcc.Loading(
+                            dbc.Col(dcc.Graph(id='population_chart'), width=6),
+                        )
+                ]),
               ], fluid=True),
 
 
