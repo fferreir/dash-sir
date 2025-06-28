@@ -3,13 +3,14 @@ from dash import html, dcc, Input, Output
 import dash_bootstrap_components as dbc
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.integrate import odeint
+from scipy.integrate import solve_ivp
 from numpy import heaviside
 from textwrap import dedent
 import plotly.graph_objects as go
 
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUMEN, dbc.icons.FONT_AWESOME])
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUMEN, dbc.icons.FONT_AWESOME], requests_pathname_prefix='/dash_sir/')
+server = app.server
 
 cabecalho = html.H1("Modelo SIRS com vacinação",className="bg-primary text-white p-2 mb-4")
 
@@ -39,7 +40,7 @@ cond_inicial = dcc.Markdown(
     '''
     * coeficiente de transmissão: $$\\beta=0.5 \\space ano^{-1}$$
     * taxa de recuperação: $$\\gamma=0.01 \\space ano^{-1}$$
-    * taxa de vacinação: $$\\nu_0=0.0 \\space ano^{-1}$$, $$t_1=20$$ e $$t_2=50$$
+    * taxa de vacinação: $$\\nu_0=5.0 \\space ano^{-1}$$, $$t_1=2$$ e $$t_2=5$$
     * texa de perda de imunidade: $$\\delta=1 \\space ano^{-1}$$
     * taxa de natalidade (= taxa de mortalidade): $$\\alpha=\\mu=0.15 \\space ano^{-1}$$
     * condições iniciais: $$S(0)=100$$, $$I(0)=1$$, $$R(0)=0$$
@@ -116,7 +117,7 @@ ajuste_parametros = html.Div(
             html.Div(
                 [
                     dbc.Label(dcc.Markdown('''$$\\alpha$$ taxa de natalidade e $$\\mu$$ taxa de mortalidade''', mathjax=True), html_for="alpha"),
-                    dcc.Slider(id="alpha", min=0.1, max=0.15, value=0.2, tooltip={"placement": "bottom", "always_visible": False}),
+                    dcc.Slider(id="alpha", min=0.1, max=0.15, value=0.1, tooltip={"placement": "bottom", "always_visible": False}),
                 ],
                 className="m-2",
             ),
@@ -207,12 +208,10 @@ app.layout = dbc.Container([
                 dbc.Row([
                         dbc.Col(html.Div(ajuste_parametros), width=3),
                         dbc.Col(html.Div([ajuste_condicoes_iniciais,html.Div(textos_descricao)]), width=3),
-                        dcc.Loading(
-                            dbc.Col(dcc.Graph(id='population_chart'), width=6),
-                        )
+                        dbc.Col(dcc.Graph(id='population_chart'), width=6),
                 ]),
               ], fluid=True),
 
 
 if __name__ == '__main__':
-    app.run(port=8050, host='localhost', debug=True)
+    app.run(debug=True)
