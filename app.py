@@ -194,9 +194,9 @@ def gera_grafico(s_init, i_init, r_init, alpha, beta, gamma, delta, nu, vacinaca
     fig.add_trace(go.Scatter(x=sol.t, y=sol.y[0]/(sol.y[0]+sol.y[1]+sol.y[2])*100, name='Suscetível',
                              line=dict(color='#00b400', width=4)))
     fig.add_trace(go.Scatter(x=sol.t, y=sol.y[1]/(sol.y[0]+sol.y[1]+sol.y[2])*100, name ='Infectado',
-                             line=dict(color='#ff0000', width=4)))
+                             line=dict(color='#ff0000', width=4, dash='dot')))
     fig.add_trace(go.Scatter(x=sol.t, y=sol.y[2]/(sol.y[0]+sol.y[1]+sol.y[2])*100, name='Recuperado',
-                             line=dict(color='#0000ff', width=4)))
+                             line=dict(color='#0000ff', width=4, dash='dashdot')))
     fig.update_layout(title='Dinâmica Modelo SIRS com vacinação',
                        xaxis_title='Tempo (anos)',
                        yaxis_title='Proporção da população')
@@ -207,10 +207,11 @@ app.layout = dbc.Container([
                 dbc.Row([
                         dbc.Col(html.Div(ajuste_parametros), width=3),
                         dbc.Col(html.Div([ajuste_condicoes_iniciais,html.Div(textos_descricao)]), width=3),
-                        dbc.Col(dcc.Graph(id='population_chart'), width=6),
+                        dbc.Col(dcc.Graph(id='population_chart', className="shadow-sm rounded-3 border-primary",
+                                style={'height': '500px'}), width=6),
                 ]),
               ], fluid=True),
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
