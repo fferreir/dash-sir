@@ -1,6 +1,6 @@
 # 🦠 dash-sir: Simulador do Modelo SIRS com Vacinação e Mortalidade
 
-Aplicação web interativa desenvolvida com **Dash**, **Plotly**, **Bootstrap** e **SciPy** para simulação e estudo de dinâmicas epidemiológicas através de um modelo compartimental determinístico do tipo **SIRS** (*Suscetível – Infectado – Recuperado – Suscetível*), com estratégia de vacinação por pulsos temporários e taxa de mortalidade induzida pela doença.
+Aplicação web interativa desenvolvida com **Dash**, **Plotly**, **Bootstrap Components** e **SciPy** para simulação e estudo de dinâmicas epidemiológicas através de um modelo compartimental determinístico do tipo **SIRS** (*Suscetível – Infectado – Recuperado – Suscetível*), com estratégia de vacinação por pulsos temporários e taxa de mortalidade induzida pela doença.
 
 ---
 
@@ -11,6 +11,7 @@ Aplicação web interativa desenvolvida com **Dash**, **Plotly**, **Bootstrap** 
 - [Principais Funcionalidades](#-principais-funcionalidades)
 - [Estrutura do Projeto](#-estrutura-do-projeto)
 - [Instalação e Execução](#-instalação-e-execução)
+- [Testes Automatizados](#-testes-automatizados)
 - [Roteiro de Estudo e Perguntas](#-roteiro-de-estudo-e-perguntas)
 - [Licença](#-licença)
 
@@ -25,6 +26,8 @@ Diferenciais implementados no modelo:
 2. **Mortalidade Induzida pela Doença ($\alpha$):** Além da mortalidade natural demográfica ($\mu$), indivíduos infectados podem sucumbir à doença a uma taxa $\alpha$, permitindo avaliar a virulência do patógeno e a redução na população sobrevivente.
 3. **Indicadores em Tempo Real (KPIs):** Cards de acompanhamento do total acumulado de imunizações administradas, total acumulado de mortes, pico epidêmico e sobreviventes finais.
 4. **Visualização Flexível:** Alternância dinâmica entre proporção da população inicial (%) e contagem absoluta de indivíduos.
+5. **Cenários Didáticos Rápidos:** Botões de predefinição rápida para carregar instantaneamente as questões pedagógicas de estudo.
+6. **Rodapé Institucional:** Rodapé com link para o código-fonte aberto no GitHub.
 
 ---
 
@@ -75,6 +78,7 @@ $$\frac{d}{dt}\big(S(t) + I(t) + R(t) + D(t)\big) = 0 \implies S(t) + I(t) + R(t
 ## 🌟 Principais Funcionalidades
 
 - **Controle Interativo por Sliders:** Ajuste instantâneo de todos os parâmetros epidemiológicos, demográficos e vacinais com exibição dinâmica dos valores selecionados em badges.
+- **Cenários Didáticos Rápidos:** Botões para carregar com um clique os cenários de referência e as questões pedagógicas.
 - **Curva de Mortalidade por Doença ($D$):** Acompanhamento contínuo da evolução temporal dos óbitos induzidos pela infecção.
 - **Cards de Métricas (KPIs):**
   - 💉 **Total de Vacinados:** Integral acumulada $\int \nu(t) S(t) dt$ refletindo o esforço vacinal total.
@@ -84,20 +88,33 @@ $$\frac{d}{dt}\big(S(t) + I(t) + R(t) + D(t)\big) = 0 \implies S(t) + I(t) + R(t
 - **Faixa da Campanha Vacinal no Gráfico:** Região sombreada no gráfico destacando visualmente o período $[t_1, t_2]$.
 - **Integração Numérica Robusta:** Utilização do método implícito `Radau` (`scipy.integrate.solve_ivp`), adequado para sistemas rígidos (*stiff*) que surgem com mudanças bruscas em campanhas de vacinação.
 - **Compatibilidade de Deploy e Desenvolvimento:** Suporte a rota de produção `/dash_sir/` com redirecionamento automático da rota raiz `/` em desenvolvimento local.
+- **Rodapé com Link para o GitHub:** Identificação visual e link direto para o repositório oficial no GitHub.
 
 ---
 
 ## 📁 Estrutura do Projeto
 
+O projeto adota a arquitetura modular estabelecida em [dash_sli](https://github.com/fferreir/dash_sli):
+
 ```text
 dash-sir/
-├── app.py                 # Aplicação Dash principal (layout, EDOs e callbacks)
+├── app.py                 # Ponto de entrada leve da aplicação Dash e rotas
 ├── assets/
-│   ├── estilos.css        # Folha de estilo customizada (KPI cards, tipografia, badges)
+│   ├── estilos.css        # Folha de estilos (Design system: Hero, KPIs, Sliders)
 │   └── SIR.png            # Diagrama explicativo do modelo compartimental
-├── requirements.txt       # Dependências essenciais do projeto
+├── pytest.ini             # Configuração do executor de testes (pythonpath = .)
+├── requirements.txt       # Dependências do projeto (Dash, SciPy, Plotly, pytest)
 ├── LICENSE                # Licença GNU GPLv3
-└── README.md              # Documentação completa do projeto
+├── README.md              # Documentação completa do projeto
+├── src/
+│   ├── __init__.py        # Inicialização do pacote src
+│   ├── model.py           # EDOs, métricas analíticas (R0) e rotina de simulação numérica
+│   ├── layout.py          # Interface visual, hero header, controles, acordeom e rodapé com link GitHub
+│   └── callbacks.py       # Callbacks reativos (cenários, badges, simulação e gráficos)
+└── tests/
+    ├── __init__.py        # Inicialização do módulo de testes
+    ├── test_app.py        # Testes de integração de interface, validação do rodapé e layout
+    └── test_model.py      # Testes unitários das EDOs, lei de conservação e métricas
 ```
 
 ---
@@ -141,6 +158,16 @@ Abra o navegador em:
 > ```bash
 > export DASH_REQUESTS_PATHNAME_PREFIX="/dash_sir/"
 > ```
+
+---
+
+## 🧪 Testes Automatizados
+
+A bateria de testes automatizados com `pytest` valida tanto o modelo matemático e suas leis de conservação quanto os componentes da interface gráfica:
+
+```bash
+pytest -v
+```
 
 ---
 
